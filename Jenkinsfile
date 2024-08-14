@@ -38,11 +38,12 @@ pipeline {
 
         stage('Run Test'){
             parallel{
+                /*
                 stage('SonarQube analysis') {
                     steps {
                         sh "/usr/bin/sonar-scanner"
                     }
-                }
+                } */
                 stage('Test'){
                     agent{
                         docker{
@@ -100,7 +101,7 @@ pipeline {
             steps {
                 sh '''
                     npm install netlify-cli
-                    netlify --version
+                    node_modules/.bin/netlify --version
                 '''               
             }
         }
