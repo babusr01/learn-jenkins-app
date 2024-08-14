@@ -5,6 +5,8 @@ pipeline {
             APP_NAME = 'learn CI/CD with Jenkins'
             BUILD_NUMBER = "${env.BUILD_NUMBER}"
             IMAGE_VERSION = "v_${BUILD_NUMBER}"
+            NETLIFY_SITE_ID = 'f28b3e7b-7f7c-4e11-9db5-3ab4f79ec48b'
+
 
     }
 
@@ -102,6 +104,7 @@ pipeline {
                 sh '''
                     npm install netlify-cli
                     node_modules/.bin/netlify --version
+                    echo "deploying to product. Site id  : $NETLIFY_SITE_ID"
                 '''               
             }
         }
