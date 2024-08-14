@@ -16,6 +16,7 @@ pipeline {
     }
 
     stages {
+
         stage('Build') {
             agent{
                 docker{
@@ -49,24 +50,24 @@ pipeline {
                             reuseNode true
                         }
                     }
-                    steps{
-                    sh '''
+                    steps{ 
+                        sh '''
                         echo "Test Stage"
                         find  ./build -name index.html
                         test -f ./build/index.html
                         npm test
-                    '''
+                        '''
                     }
-
-                        post {
-        always{
-            junit 'jest-results/junit.xml'
-        }
-    }
+                    post {        
+                        always{
+                            junit 'jest-results/junit.xml'
+                        }
+                    }
                 }
 
                 stage('E2E'){
-                    agent{ docker{
+                    agent{
+                         docker{
                             image 'mcr.microsoft.com/playwright:v1.46.0-jammy'
                             reuseNode true
                         }
@@ -80,13 +81,27 @@ pipeline {
                         npx playwright test --reporter=html
                     '''
                     }
-
-                        post {
-        always{
-            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
-        }
-    }
+                    post {
+                        always{
+                        publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+                        }
+                    }
                 }
+            }
+        }
+
+        stage('Deploy'){
+            agent{
+                docker{
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh '''
+                    npm install netlify-cli
+                    netlify --version
+                '''               
             }
         }
     }
