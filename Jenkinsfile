@@ -1,6 +1,20 @@
 pipeline {
     agent any
 
+    environment{
+            APP_NAME = 'learn CI/CD with Jenkins'
+            BUILD_NUMBER = "${env.BUILD_NUMBER}"
+            IMAGE_VERSION = "v_${BUILD_NUMBER}"
+
+    }
+
+    parameters{
+        string(defaultValue: "develop", description: 'Branch Specifier', name: 'SPECIFIER')
+        booleanParam(defaultValue: false, description: 'Deploy to QA Environment ?', name: 'DEPLOY_QA')
+        booleanParam(defaultValue: false, description: 'Deploy to UAT Environment ?', name: 'DEPLOY_UAT')
+        booleanParam(defaultValue: false, description: 'Deploy to PROD Environment ?', name: 'DEPLOY_PROD')
+    }
+
     stages {
         stage('Build') {
             agent{
@@ -47,8 +61,7 @@ pipeline {
                 }
 
                 stage('E2E'){
-                    agent{
-                        docker{
+                    agent{ docker{
                             image 'mcr.microsoft.com/playwright:v1.46.0-jammy'
                             reuseNode true
                         }
