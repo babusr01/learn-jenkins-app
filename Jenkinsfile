@@ -37,6 +37,11 @@ pipeline {
 
         stage('Run Test'){
             parallel{
+                stage('SonarQube analysis') {
+                    steps {
+                        sh "/usr/bin/sonar-scanner"
+                    }
+                }
                 stage('Test'){
                     agent{
                         docker{
