@@ -84,7 +84,7 @@ pipeline {
             }
         }
 
-        stage('Approval'){
+        stage('Approval - Staging'){
             steps{
                 timeout(time: 5, unit: 'MINUTES') {
                    input message: 'Ready to deploy', ok: 'Yes, I am sure and want to Deploy!'
@@ -111,7 +111,7 @@ pipeline {
             }
         }
 
-          stage('Approval'){
+          stage('Approval - Prod'){
             steps{
                 timeout(time: 5, unit: 'MINUTES') {
                    input message: 'Ready to deploy', ok: 'Yes, I am sure and want to Deploy!'
