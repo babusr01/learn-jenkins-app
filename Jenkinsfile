@@ -6,7 +6,7 @@ pipeline {
             BUILD_NUMBER = "${env.BUILD_NUMBER}"
             IMAGE_VERSION = "v_${BUILD_NUMBER}"
             NETLIFY_SITE_ID = 'f28b3e7b-7f7c-4e11-9db5-3ab4f79ec48b'
-            NETLIFY_AUTH_TOKEN = credentials('netlify-token')         
+            NETLIFY_AUTH_TOKEN = credentials('netlify-token')                     
     }
 
     stages {
@@ -77,7 +77,7 @@ pipeline {
                     }
                     post {
                         always{
-                        publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+                        publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright Local Report', reportTitles: '', useWrapperFileDirectly: true])
                         }
                     }
                 }
@@ -101,5 +101,30 @@ pipeline {
                 '''               
             }
         }
+
+        stage('Prod E2E'){
+        agent{
+                docker{
+                image 'mcr.microsoft.com/playwright:v1.46.0-jammy'
+                reuseNode true
+            }
+        }
+
+        environment{
+            CI_ENVIRONMENT_URL = 'https://cool-croissant-3a12c9.netlify.app'
+        }
+
+        steps{
+        sh '''
+            npx playwright test --reporter=html
+        '''
+        }
+        post {
+            always{
+            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright E2E Report', reportTitles: '', useWrapperFileDirectly: true])
+            }
+        }
+    }
+
     }
 }
