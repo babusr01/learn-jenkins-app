@@ -86,7 +86,10 @@ pipeline {
 
         stage('Approval'){
             steps{
-                input message: 'Ready to deploy', ok: 'Yes, I am sure and want to Deploy!'
+                timeout(time: 5, unit: 'MINUTES') {
+                   input message: 'Ready to deploy', ok: 'Yes, I am sure and want to Deploy!'
+                }
+                
             }
         }
 
@@ -105,6 +108,15 @@ pipeline {
                     node_modules/.bin/netlify status
                     node_modules/.bin/netlify deploy --dir=build 
                 '''               
+            }
+        }
+
+          stage('Approval'){
+            steps{
+                timeout(time: 5, unit: 'MINUTES') {
+                   input message: 'Ready to deploy', ok: 'Yes, I am sure and want to Deploy!'
+                }
+                
             }
         }
 
