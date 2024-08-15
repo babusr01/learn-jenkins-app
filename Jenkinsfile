@@ -117,32 +117,31 @@ pipeline {
         }
 
         stage('Staging E2E'){
-        agent{
-                docker{
-                image 'mcr.microsoft.com/playwright:v1.46.0-jammy'
-                reuseNode true
+            agent{
+                    docker{
+                    image 'mcr.microsoft.com/playwright:v1.46.0-jammy'
+                    reuseNode true
+                }
             }
-        }
 
-        environment{
-            CI_ENVIRONMENT_URL = "${env.STAGING_URL}"
-        }
+            environment{
+                CI_ENVIRONMENT_URL = "${env.STAGING_URL}"
+            }
 
-        steps{
-        sh '''
-            npx playwright install
-            npx playwright test --reporter=html
-        '''
-        }
-        post {
-            always{
-            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Staging E2E Report', reportTitles: '', useWrapperFileDirectly: true])
+            steps{
+            sh '''
+                npx playwright install
+                npx playwright test --reporter=html
+            '''
+            }
+            post {
+                always{
+                publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Staging E2E Report', reportTitles: '', useWrapperFileDirectly: true])
+                }
             }
         }        
 
-
-
-          stage('Approval - Prod'){
+        stage('Approval - Prod'){
             steps{
                 timeout(time: 5, unit: 'MINUTES') {
                    input message: 'Ready to deploy', ok: 'Yes, I am sure and want to Deploy!'
@@ -170,29 +169,28 @@ pipeline {
         }
 
         stage('Prod E2E'){
-        agent{
-                docker{
-                image 'mcr.microsoft.com/playwright:v1.46.0-jammy'
-                reuseNode true
+            agent{
+                    docker{
+                    image 'mcr.microsoft.com/playwright:v1.46.0-jammy'
+                    reuseNode true
+                }
+            }
+
+            environment{
+                CI_ENVIRONMENT_URL = 'https://cool-croissant-3a12c9.netlify.app'
+            }
+
+            steps{
+            sh '''
+                npx playwright install
+                npx playwright test --reporter=html
+            '''
+            }
+            post {
+                always{
+                publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Prod E2E Report', reportTitles: '', useWrapperFileDirectly: true])
+                }
             }
         }
-
-        environment{
-            CI_ENVIRONMENT_URL = 'https://cool-croissant-3a12c9.netlify.app'
-        }
-
-        steps{
-        sh '''
-            npx playwright install
-            npx playwright test --reporter=html
-        '''
-        }
-        post {
-            always{
-            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Prod E2E Report', reportTitles: '', useWrapperFileDirectly: true])
-            }
-        }
-    }
-
-    }
+    }   
 }
