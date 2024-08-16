@@ -23,6 +23,7 @@ pipeline {
                     node --version                    
                     npm --version
                     npm ci
+                    npm i -D sonarqube-scanner
                     npm run build
                     ls -la
                 '''               
