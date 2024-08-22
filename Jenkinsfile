@@ -22,13 +22,22 @@ pipeline {
                     ls -la
                     node --version                    
                     npm --version
-                    npm ci
-                    npm i -D sonarqube-scanner
+                    npm ci        
                     npm run build
                     ls -la
                 '''               
             }
         }
+
+        Stage("Sonar"){
+            steps {
+                def scannerHome = tool 'SonarQubeScanner3'
+                withSonarQubeEnv('SonarQube') {
+                    sh "${scannerHome}/bin/sonar-scanner"
+                }
+            }
+        }
+
 
         stage('Run Test'){
             parallel{
